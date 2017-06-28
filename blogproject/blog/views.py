@@ -3,11 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Post, Category
 import markdown
-from blogproject.comments.forms import CommentForm
 
-import sys
-sys.path.append('f:\joe\Workspace\/blogproject\comments\/forms.py')
-# import forms
 
 # Create your views here.
 # 主页视图
@@ -30,17 +26,7 @@ def detail(request, pk):
         'markdown.extensions.codehilite',
         'markdown.extensions.toc',
     ])
-    # import CommentForm, 新建CommentForm实例对象
-    form = CommentForm()
-    # 获取这篇post文章下的全部评论
-    comment_list = post.comment_set.all()
-    # 将post, form, comment_list作为模板变量传给detail.html模板进行渲染
-    context = {
-        'post': post,
-        'form': form,
-        'comment_list': comment_list
-    }
-    return render(request, 'blog/detail.html', context=context)
+    return render(request, 'blog/detail.html', context={'post': post})
 
 
 # 归档详情页视图
