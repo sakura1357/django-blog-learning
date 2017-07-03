@@ -1,10 +1,12 @@
 # coding:utf-8
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.six import python_2_unicode_compatible
 from django.urls import reverse
 import markdown
 from django.utils.html import strip_tags
+from django.db.models.aggregates import Count
 # Create your models here.
 # 默认创建表格的时候，Django会自动创建id字段，无需在model中手动声明
 # 使用装饰器decorator，修饰类

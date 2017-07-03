@@ -1,7 +1,7 @@
 # coding:utf-8
 from django.shortcuts import render, get_object_or_404
 # from django.http import HttpResponse
-from .models import Post, Category
+from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
@@ -19,11 +19,36 @@ def index(request):
     return render(request, 'blog/index.html', context={'post_list': post_list})
 
 
+# 类视图中,ListView已经做好了分页逻辑,我们只需指定paginate_by属性来开启分页功能即可
 # 使用类视图IndexView替代视图函数index
 class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
+    # 指定paginate_by 属性开启分页功能，其值表示每一页包含多少篇文章
+    paginate_by = 3
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     paginator = context.get('paginator')
+    #     page = context.get('page_obj')
+    #     is_paginated = context.get('is_paginated')
+    #
+    #
+    # def pagination_data(self, paginator, page, is_paginated):
+    #     if not is_paginated:
+    #         return {}
+    #     left = []
+    #     right = []
+    #     left_has_more = False
+    #     right_has_more = False
+    #     first = False
+    #     last = False
+    #     page_number = page.number
+    #     total_pages = paginator.num_pages
+    #     page_range = paginator.page_range
+    #     if page_number == 1:
+    #         right = page_range[page_number: page_number + 2]
 
 
 # 文章详情页视图
@@ -128,3 +153,15 @@ class CategoryView(IndexView):
     def get_queryset(self):
         cate = get_object_or_404(Category, pk=self.kwargs.get('pk'))
         return super(CategoryView, self).get_queryset().filter(category=cate)
+
+
+# 使用类视图TagView显示某个标签下的文章列表
+class TagView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
+
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs.get('pk'))
+        return super(TagView, self).get_queryset().filter(tags=tag)
+
