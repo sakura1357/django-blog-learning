@@ -75,6 +75,13 @@
                     </div>
                 </section>
 {% endblock main %}
+{% block toc %}
+    <div class="widget widget-content">
+        <h3 class="widget-title">文章目录</h3>
+        <!-- safe标签防止Django对HTML代码进行转义-->
+        {{ post.toc|safe }}
+    </div>
+{% endblock toc%}
 
 
 

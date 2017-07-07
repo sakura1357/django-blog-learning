@@ -5,7 +5,8 @@ from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
-
+from django.utils.text import slugify
+from markdown.extensions.toc import TocExtension
 
 # Create your views here.
 # 主页视图
@@ -57,12 +58,23 @@ def detail(request, pk):
     # return render(request, 'blog/detail.html', context={'post': post})
     # 阅读量+1
     post.increase_views()
-    # 使用markdown语法渲染body，并支持代码格式扩展，代码语法高亮等
-    post.body = markdown.markdown(post.body, extensions=[
+    # # 使用markdown语法渲染body，并支持代码格式扩展，代码语法高亮等
+    # post.body = markdown.markdown(post.body, extensions=[
+    #     'markdown.extensions.extra',
+    #     'markdown.extensions.codehilite',
+    #     'markdown.extensions.toc',
+    # ])
+    # 实例化一个Markdown对象，可以给post动态添加toc属性
+    md = markdown.Markdown(extensions=[
         'markdown.extensions.extra',
         'markdown.extensions.codehilite',
-        'markdown.extensions.toc',
-    ])
+        # 处理目录的锚点显示问题
+        TocExtension(slugify=slugify),
+        # 'markdown.extensions.toc',
+        ])
+    post.body = md.convert(post.body)
+    post.toc = md.toc
+
     form = CommentForm()
     comment_list = post.comment_set.all()
     context = {
@@ -89,6 +101,10 @@ class PostDetailView(DetailView):
         return response
 
     # 对post对象的body进行markdown渲染
+    # extensions参数
+    # 'markdown.extensions.codehilite' 代码高亮拓展
+    # 'markdown.extensions.toc' 自动生成目录的扩展
+    # 这种直接调用markdown方法渲染post.body方法局限性在于只能通过[TOC]标记在文章内容中插入目录，而不能在页面其他地方插入。
     def get_object(self, queryset=None):
         post = super(PostDetailView, self).get_object(queryset=None)
         post.body = markdown.markdown(post.body,
