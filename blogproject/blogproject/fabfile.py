@@ -2,7 +2,7 @@ from fabric.api import env, run
 from fabric.operations import sudo
 
 GIT_REPO = 'https://github.com/sakura1357/django-blog-learning.git'
-
+# test
 env.user = 'siar'
 env.password = '123456'
 
